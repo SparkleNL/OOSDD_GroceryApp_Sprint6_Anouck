@@ -70,7 +70,24 @@ namespace Grocery.Core.Data.Repositories
 
         public Product Add(Product item)
         {
-            throw new NotImplementedException();
+            string insertQuery = "INSERT INTO Product(Name, Stock, Date, Price) VALUES(@Name, @Stock, @Date, @Price)";
+            OpenConnection();
+            using (SqliteCommand command = new(insertQuery, Connection))
+            {
+                command.Parameters.AddWithValue("@Name", item.Name);
+                command.Parameters.AddWithValue("@Stock", item.Stock);
+                command.Parameters.AddWithValue("@Date", item.ShelfLife.ToString("yyyy-MM-dd"));
+                command.Parameters.AddWithValue("@Price", item.Price);
+
+                command.ExecuteNonQuery();
+                
+                // Get the last inserted ID
+                command.CommandText = "SELECT last_insert_rowid()";
+                item.Id = Convert.ToInt32(command.ExecuteScalar());
+            }
+            CloseConnection();
+            
+            return item;
         }
 
         public Product? Delete(Product item)

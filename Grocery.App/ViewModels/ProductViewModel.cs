@@ -16,14 +16,31 @@ namespace Grocery.App.ViewModels
             _productService = productService;
             _globalViewModel = globalViewModel;
             Products = [];
-            foreach (Product p in _productService.GetAll()) Products.Add(p);
+            LoadProducts();
+        }
+
+        public override void OnAppearing()
+        {
+            base.OnAppearing();
+            LoadProducts();
+        }
+
+        public void LoadProducts()
+        {
+            Products.Clear();
+            foreach (Product p in _productService.GetAll()) 
+            {
+                Products.Add(p);
+            }
         }
 
         [RelayCommand]
         public async Task NavigateToNewProduct()
         {
-            if (_globalViewModel.Client?.Role == Role.Admin) await Shell.Current.GoToAsync(nameof(Views.NewProductView), true);
-            
+            if (_globalViewModel.Client?.Role == Role.Admin) 
+            {
+                await Shell.Current.GoToAsync(nameof(Views.NewProductView), true);
+            }
         }
     }
 }
